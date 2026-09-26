@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models.Domain;
+﻿using WebApplication1.Models.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace WebApplication1.Models.Data
 {
@@ -12,9 +12,6 @@ namespace WebApplication1.Models.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-
-
-
         }
     }
 }
