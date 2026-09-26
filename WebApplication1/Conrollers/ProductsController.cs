@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using WebApplication1.Models.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using WebApplication1.Services;
 using WebApplication1.Models.Domain;
 
 namespace WebApplication1.Conrollers
@@ -14,25 +8,25 @@ namespace WebApplication1.Conrollers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IProductService _service;
 
-        public ProductsController(AppDbContext context)
+        public ProductsController(IProductService service)
         {
-            _context = context;
+            _service = service;
         }
 
         // GET: api/Products
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            return await _context.Product.ToListAsync();
+            return await _service.Product.ToListAsync();
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            var product = await _service.Product.FindAsync(id);
 
             if (product == null)
             {
@@ -52,11 +46,11 @@ namespace WebApplication1.Conrollers
                 return BadRequest();
             }
 
-            _context.Entry(product).State = EntityState.Modified;
+            _service.Entry(product).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _service.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -78,8 +72,8 @@ namespace WebApplication1.Conrollers
         [HttpPost]
         public async Task<ActionResult<Product>> PostProduct(Product product)
         {
-            _context.Product.Add(product);
-            await _context.SaveChangesAsync();
+            _service.Product.Add(product);
+            await _service.SaveChangesAsync();
 
             return CreatedAtAction("GetProduct", new { id = product.Id }, product);
         }
@@ -88,21 +82,21 @@ namespace WebApplication1.Conrollers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProduct(int id)
         {
-            var product = await _context.Product.FindAsync(id);
+            var product = await _service.Product.FindAsync(id);
             if (product == null)
             {
                 return NotFound();
             }
 
-            _context.Product.Remove(product);
-            await _context.SaveChangesAsync();
+            _service.Product.Remove(product);
+            await _service.SaveChangesAsync();
 
             return NoContent();
         }
 
         private bool ProductExists(int id)
         {
-            return _context.Product.Any(e => e.Id == id);
+            return _service.Product.Any(e => e.Id == id);
         }
     }
 }
